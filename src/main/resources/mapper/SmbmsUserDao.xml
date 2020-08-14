@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mpdome.dao.SmbmsUserDao">
+
+    <resultMap id="roleMap" type="com.mpdome.entity.SmbmsRole">
+        <id property="id" column="id"/>
+        <result property="rolecode" column="roleCode"/>
+        <result property="rolename" column="roleName"/>
+        <collection property="permissions" ofType="com.mpdome.entity.SmbmsPermission">
+            <id property="pid" column="pid"/>
+            <result property="permission" column="permission"/>
+        </collection>
+    </resultMap>
+    <resultMap id="userMap" type="com.mpdome.entity.SmbmsUser">
+        <id property="id" column="id"/>
+        <result property="username" column="userName"/>
+        <result property="phone" column="phone"/>
+        <collection property="roles" resultMap="roleMap"/>
+    </resultMap>
+    <select id="findUser" resultMap="userMap">
+        select smbms_user.id,
+               userName,
+               smbms_role.roleCode,
+               smbms_role.roleName,
+               smbms_permission.permission,
+               smbms_permission.pid
+        from smsms.smbms_role,
+             smsms.smbms_user,
+             smsms.userAndRole,
+             smsms.RoleAndPermission,
+             smsms.smbms_permission
+        where smbms_role.id = userAndRole.rid
+          and smbms_user.id = smsms.userAndRole.uid
+          and smbms_user.id = 1
+          and smbms_role.id = RoleAndPermission.rid
+          and RoleAndPermission.pid = smbms_permission.pid
+    </select>
+</mapper>
